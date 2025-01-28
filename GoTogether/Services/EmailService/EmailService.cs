@@ -130,7 +130,7 @@ public class EmailService : IEmailService
 
             string url = $"{ConfigurationHelper.GetBaseUrl()}:7111/EmailSender/SendInvite";
 
-            await SendMessage(url, Helpers.GenerateInviteJson(user.c_email, invite.c_code));
+            await SendMessage(url, Helpers.GenerateInviteMessageBodyJson(user.c_email, invite.c_code));
             return true;
         }
         catch (HttpRequestException hrq)

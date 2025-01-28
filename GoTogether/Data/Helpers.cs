@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -77,7 +78,7 @@ namespace Server.Data.Helpers
             var token = GetTokenFromHeader(httpContextAccessor);
             if (string.IsNullOrWhiteSpace(token))
                 throw new ArgumentException("AUTH_TOKEN_MISSING_PROBLEM", nameof(token));
-            
+
             var jwtToken = new JwtSecurityTokenHandler().ReadToken(token) as JwtSecurityToken;
             if (jwtToken == null)
                 throw new ArgumentException("INVALID_TOKEN_PROBLEM");
@@ -88,7 +89,7 @@ namespace Server.Data.Helpers
 
             if (!Guid.TryParse(claim.Value, out var userId))
                 throw new ArgumentException("AUTH_TOKEN_CLAIM_INVALID");
-            
+
             var user = await db.Users.FirstOrDefaultAsync(u => u.id == userId);
             if (user == null)
                 throw new KeyNotFoundException("USER_NOT_FOUND_PROBLEM");
@@ -96,41 +97,43 @@ namespace Server.Data.Helpers
             return user;
         }
 
-        public static int GenerateCode()
-        {
-            Random random = new Random();
-            return random.Next(100000, 999999);
-        }
+        public static int GenerateCode() => new Random().Next(100000, 999999);
 
         public static StringContent GenerateEmailCodeJson(string address, int code = -1)
         {
             if (code < 0)
-            {
                 code = GenerateCode();
-            }
-
-            var recoveryMessage = new
-            {
-                address = address,
-                code = code.ToString()
-            };
 
             return new StringContent(
-                JsonSerializer.Serialize(recoveryMessage),
+                JsonSerializer.Serialize(new
+                {
+                    address = address,
+                    code = code.ToString()
+                }),
                 Encoding.UTF8, "application/json"
             );
         }
-        
-        public static StringContent GenerateInviteJson(string address, string code)
-        {
-            var inviteMessage = new
-            {
-                address = address,
-                code = code
-            };
 
+        public static StringContent GenerateInviteMessageBodyJson(string address, string code)
+        {
             return new StringContent(
-                JsonSerializer.Serialize(inviteMessage), Encoding.UTF8, "application/json");
+                JsonSerializer.Serialize(new
+                {
+                    address = address,
+                    code = code
+                }),
+                Encoding.UTF8, "application/json");
+        }
+
+        public static bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
+            string pattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+            Regex regex = new Regex(pattern);
+
+            return regex.IsMatch(email);
         }
     }
 }

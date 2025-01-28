@@ -31,7 +31,7 @@ namespace GraphQLServer
         }
         
         [Authorize]
-        [GraphQLDescription("Получить данные о поездке по его id")]
+        [GraphQLDescription("AUTHORIZE-Получить данные о поездке по его id")]
         public async Task<Trip> GetTripInfo(Guid tripId)
         {
             var trip = await _tripService.GetTripInfo(tripId);
@@ -43,7 +43,7 @@ namespace GraphQLServer
         }
         
         [Authorize]
-        [GraphQLDescription("Получить данные о всех поездках человека по его id")]
+        [GraphQLDescription("AUTHORIZE-Получить данные о всех поездках человека по его id")]
         public async Task<List<Trip>> GetUserTrips(Guid userId)
         {
             var trip = await _tripService.GetUserTrips(userId);
@@ -56,14 +56,14 @@ namespace GraphQLServer
         
         
         [Authorize]
-        [GraphQLDescription("Получить данные о пользователе по его токену авторизации")]
+        [GraphQLDescription("AUTHORIZE-Получить данные о пользователе по его токену авторизации")]
         public async Task<User> GetUserByToken()
         {
             return await _userService?.GetUserByToken();
         }
         
         [Authorize]
-        [GraphQLDescription("Получить данные о пользователе по его id")]
+        [GraphQLDescription("AUTHORIZE-Получить данные о пользователе по его id")]
         public async Task<User> GetUserById(Guid userId)
         {
             return await _userService?.GetUserById(userId);

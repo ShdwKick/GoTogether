@@ -1,0 +1,81 @@
+# Rider-specific files
+.idea/
+*.sln.iml
+/.riderModule.iml
+/_ReSharper.Caches/
+
+# Build output
+bin/
+obj/
+[Ll]og/
+[Ll]ogs/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+
+# Cache files
+*.[Cc]ache
+*.dbmdl
+*.cachefile
+
+# VS Code files (optional if you use Rider exclusively)
+.vscode/
+.history/
+.vs/
+
+# Coverage and Test Results
+*.coverage
+*.coveragexml
+TestResults/
+
+# Azure-specific files
+PublishScripts/
+*.pubxml
+*.publishproj
+AppPackages/
+BundleArtifacts/
+*.appx
+*.appxbundle
+*.appxupload
+
+# Sensitive configuration files
+GoTogether/appsettings.json
+GoTogether/appsettings.Development.json
+
+# Temporary and backup files
+~$*
+*.tmp
+*.bak
+
+# Node.js (if used)
+node_modules/
+
+# DotNet artifacts
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Miscellaneous
+*.log
+*.tlog
+*.pidb
+*.svclog
+*.tss
+*.aps
+*.ncb
+*.opt
+
+# Ignore compiled Python files (if any Python scripts are present)
+__pycache__/
+*.pyc

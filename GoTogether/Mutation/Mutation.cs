@@ -49,9 +49,9 @@ namespace GraphQLServer
         }
 
         [GraphQLDescription("Мутация для создания пользователя, возвращает jwt токен")]
-        public async Task<string> CreateUser(UserForCreate user) //, Guid? roleGuid)
+        public async Task<string> CreateUser(UserForCreate user, Guid? roleGuid = null)
         {
-            return await _userService.CreateUser(user); //, roleGuid);
+            return await _userService.CreateUser(user, roleGuid);
         }
 
         [GraphQLDescription("Мутация для авторизации пользователя, возвращает новый jwt токен")]

@@ -1,5 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using GraphQLServer.Services.HostedServices.DatabaseInitializerService;
 using GraphQLServer.Services.PlaceService;
 using GraphQLServer.Services.RecoveryService;
 using GraphQLServer.Services.TripService;
@@ -24,12 +25,12 @@ namespace GraphQLServer
 
             // Настройка авторизации
             builder.Services.AddAuthorization();
+            
 
             builder.Services.AddScoped<Query>();
             builder.Services.AddScoped<Mutation>();
             builder.Services.AddScoped<Subsription>();
             builder.Services.AddScoped<DataBaseConnection>();
-            builder.Services.AddHttpClient();
 
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
@@ -37,7 +38,9 @@ namespace GraphQLServer
             builder.Services.AddScoped<IPlaceService, PlaceService>();
             builder.Services.AddSingleton(new ConfigurationHelper(builder.Configuration));
 
+            builder.Services.AddHostedService<DataBaseInitializerService>();
 
+            builder.Services.AddHttpClient();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddMemoryCache();
             builder.Services.AddWebSockets(options => { options.KeepAliveInterval = TimeSpan.FromSeconds(120); });
@@ -93,6 +96,7 @@ namespace GraphQLServer
             
             app.MapGraphQL();
             //app.MapControllers();
+            
 
             app.Run();
         }

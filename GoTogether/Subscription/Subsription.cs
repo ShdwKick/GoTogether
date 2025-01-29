@@ -32,9 +32,9 @@ namespace GraphQLServer
             return Task.FromResult(Message);
         }
 
-        public ValueTask<ISourceStream<RoomUserListChange>> SubscribeToRoomUsersListChanged(Guid roomId, [Service] ITopicEventReceiver eventReceiver)
+        public ValueTask<ISourceStream<TripUserListChange>> SubscribeToRoomUsersListChanged(Guid roomId, [Service] ITopicEventReceiver eventReceiver)
         {
-            return eventReceiver.SubscribeAsync<RoomUserListChange>($"Room_{roomId}");
+            return eventReceiver.SubscribeAsync<TripUserListChange>($"Room_{roomId}");
         }
     }
 

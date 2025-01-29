@@ -53,7 +53,7 @@ public class UserService : IUserService
         return user;
     }
 
-    public async Task<string> CreateUser(UserForCreate user) //, Guid? roleGuid)
+    public async Task<string> CreateUser(UserForCreate user, Guid? roleGuid = null)
     {
         var usr = await _dataBaseConnection.Users.FirstOrDefaultAsync(q =>
             q.c_email == user.c_email || q.c_nickname == user.c_nickname);
@@ -74,12 +74,10 @@ public class UserService : IUserService
             // c_google_token = user.c_google_token,
         };
 
-        // var role = _dataBaseConnection.Roles.FirstOrDefault(q => q.id == roleGuid);
-        // if (role == null)
-        //     role = _dataBaseConnection.Roles.FirstOrDefault(q => q.c_dev_name == "User");
-
-        // if (role != null)
-        //     usr.f_role = (Guid)role.id;
+        var role = _dataBaseConnection.Roles.FirstOrDefault(q => q.id == roleGuid);
+        if (role == null)
+            role = await _dataBaseConnection.Roles.FirstOrDefaultAsync(q => q.c_dev_name == "User");
+        usr.f_role = role.id;
 
         var newToken = new AuthorizationToken();
         newToken.c_token = new JwtSecurityTokenHandler().WriteToken(Helpers.GenerateNewToken(usr.id.ToString()));

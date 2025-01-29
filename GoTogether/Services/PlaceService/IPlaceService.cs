@@ -1,4 +1,4 @@
-﻿namespace GraphQLServer.Services.PlaceService;
+﻿namespace GoTogether.Services.PlaceService;
 
 public interface IPlaceService
 {

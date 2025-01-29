@@ -2,7 +2,7 @@
 using HotChocolate.Subscriptions;
 using Server.Data;
 
-namespace GraphQLServer
+namespace GoTogether
 {
     public class Subsription
     {

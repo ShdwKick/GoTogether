@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Server.Data;
 
-namespace GraphQLServer.Controlers;
+namespace GoTogether.Controlers;
 
 [ApiController]
 [Route("api/[controller]")]

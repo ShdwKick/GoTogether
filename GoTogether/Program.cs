@@ -1,17 +1,17 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using GraphQLServer.Services.HostedServices.DatabaseInitializerService;
-using GraphQLServer.Services.PlaceService;
-using GraphQLServer.Services.RecoveryService;
-using GraphQLServer.Services.TripService;
+﻿using System.Text;
+using GoTogether.Services.DatabaseInitializerService;
+using GoTogether.Services.PlaceService;
+using GoTogether.Services.RecoveryService;
+using GoTogether.Services.TripService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.WebSockets;
+using Microsoft.IdentityModel.Tokens;
 using Server.Data;
 using Server.Services;
 
-namespace GraphQLServer
+namespace GoTogether
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {
@@ -74,7 +74,7 @@ namespace GraphQLServer
                     };
                     options.Events = new JwtBearerEvents
                     {
-                        OnAuthenticationFailed = context => { return Task.FromResult("AUTH_FAILED_PROBLEM"); }
+                        OnAuthenticationFailed = _ => Task.FromResult("AUTH_FAILED_PROBLEM")
                     };
                 });
 

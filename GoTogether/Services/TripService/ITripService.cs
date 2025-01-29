@@ -1,6 +1,6 @@
 ﻿using Server.Data;
 
-namespace GraphQLServer.Services.TripService;
+namespace GoTogether.Services.TripService;
 
 public interface ITripService
 {

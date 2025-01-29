@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Server.Data;
 
-namespace GraphQLServer.Services.HostedServices.DatabaseInitializerService;
+namespace GoTogether.Services.DatabaseInitializerService;
 
 public class DataBaseInitializerService : IHostedService
 {

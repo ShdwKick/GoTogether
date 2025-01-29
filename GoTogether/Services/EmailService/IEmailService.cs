@@ -1,6 +1,6 @@
 ﻿using Server.Data;
 
-namespace GraphQLServer.Services.RecoveryService;
+namespace GoTogether.Services.RecoveryService;
 
 public interface IEmailService
 {

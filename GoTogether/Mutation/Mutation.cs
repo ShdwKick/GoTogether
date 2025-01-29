@@ -7,11 +7,11 @@ using Server.Data;
 using Server.Data.Helpers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Xml.Linq;
-using GraphQLServer.Services.RecoveryService;
-using GraphQLServer.Services.TripService;
+using GoTogether.Services.RecoveryService;
+using GoTogether.Services.TripService;
 using Server.Services;
 
-namespace GraphQLServer
+namespace GoTogether
 {
     public class Mutation
     {

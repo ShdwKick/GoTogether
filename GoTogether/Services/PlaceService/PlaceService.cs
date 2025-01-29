@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 
-namespace GraphQLServer.Services.PlaceService;
+namespace GoTogether.Services.PlaceService;
 
 public class PlaceService : IPlaceService
 {

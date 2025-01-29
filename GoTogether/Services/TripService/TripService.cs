@@ -1,9 +1,9 @@
-﻿using GraphQLServer.Services.PlaceService;
+﻿using GoTogether.Services.PlaceService;
 using Microsoft.EntityFrameworkCore;
 using Server.Data;
 using Server.Services;
 
-namespace GraphQLServer.Services.TripService;
+namespace GoTogether.Services.TripService;
 
 public class TripService : ITripService
 {

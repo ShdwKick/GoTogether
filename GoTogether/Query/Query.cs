@@ -1,9 +1,9 @@
-﻿using GraphQLServer.Services.TripService;
+﻿using GoTogether.Services.TripService;
 using HotChocolate.Authorization;
 using Server.Data;
 using Server.Services;
 
-namespace GraphQLServer
+namespace GoTogether
 {
 
     public class Query

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Server.Data;
 using Server.Data.Helpers;
 
-namespace GraphQLServer.Services.RecoveryService;
+namespace GoTogether.Services.RecoveryService;
 
 public class EmailService : IEmailService
 {

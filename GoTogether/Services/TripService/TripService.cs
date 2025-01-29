@@ -9,26 +9,26 @@ public class TripService : ITripService
 {
     private readonly IUserService _userService;
     private readonly IPlaceService _placeService;
-    private readonly DataBaseConnection _dataBaseConnection;
+    private readonly DatabaseConnection _databaseConnection;
     
-    public TripService(IUserService userService, IPlaceService placeService, DataBaseConnection dataBaseConnection)
+    public TripService(IUserService userService, IPlaceService placeService, DatabaseConnection databaseConnection)
     {
         _userService = userService;
         _placeService = placeService;
-        _dataBaseConnection = dataBaseConnection;
+        _databaseConnection = databaseConnection;
     }
 
     public async Task<Trip> GetTripInfo(Guid tripId)
     {
-        return await _dataBaseConnection.Trips.FindAsync(tripId);
+        return await _databaseConnection.Trips.FindAsync(tripId);
     }
 
     public async Task<List<Trip>> GetUserTrips(Guid userId)
     {
         if(userId == Guid.Empty)
-            throw new ArgumentNullException(nameof(userId));
+            throw new ArgumentException("INVALID_USER_GUID_PROBLEM");
 
-        return await _dataBaseConnection.Trips.Where(q=>q.f_author == userId).ToListAsync();
+        return await _databaseConnection.Trips.Where(q=>q.f_author == userId).ToListAsync();
     }
 
     public Task<string> GenerateTripInviteCode(Guid tripId)

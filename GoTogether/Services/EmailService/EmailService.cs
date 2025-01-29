@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using GoTogether.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -13,29 +14,29 @@ public class EmailService : IEmailService
     private readonly HttpClient _httpClient;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IMemoryCache _cache;
-    private readonly DataBaseConnection _dataBaseConnection;
+    private readonly DatabaseConnection _databaseConnection;
 
     public EmailService(IHttpContextAccessor httpContextAccessor, IMemoryCache cache,
-        IHttpClientFactory httpClientFactory, DataBaseConnection dataBaseConnection)
+        IHttpClientFactory httpClientFactory, DatabaseConnection databaseConnection)
     {
         _httpClient = httpClientFactory.CreateClient();
         _httpContextAccessor = httpContextAccessor;
         _cache = cache;
-        _dataBaseConnection = dataBaseConnection;
+        _databaseConnection = databaseConnection;
     }
 
     public async Task<bool> SendRecoveryEmail(string address)
     {
         try
         {
-            var user = await _dataBaseConnection.Users.FirstOrDefaultAsync(q => q.c_email == address);
+            var user = await _databaseConnection.Users.FirstOrDefaultAsync(q => q.c_email == address);
 
             if (user == null)
                 throw new ArgumentException("USER_NOT_FOUND_PROBLEM");
 
             int code = Helpers.GenerateCode();
 
-            await _dataBaseConnection.RecoveryCodes.AddAsync(new Codes()
+            await _databaseConnection.RecoveryCodes.AddAsync(new Codes()
             {
                 c_email = address,
                 n_code = code,
@@ -59,11 +60,11 @@ public class EmailService : IEmailService
         }
     }
 
-    public async Task<bool> SendEmailConfirmationEMail()
+    public async Task<bool> SendEmailConfirmationEmail()
     {
         try
         {
-            var user = await Helpers.GetUserFromHeader(_dataBaseConnection, _httpContextAccessor);
+            var user = await Helpers.GetUserFromHeader(_databaseConnection, _httpContextAccessor);
 
             if (user == null)
                 throw new ArgumentException("USER_NOT_FOUND_PROBLEM");
@@ -73,7 +74,7 @@ public class EmailService : IEmailService
 
             int code = Helpers.GenerateCode();
 
-            await _dataBaseConnection.ConfirmationCodes.AddAsync(new Codes()
+            await _databaseConnection.ConfirmationCodes.AddAsync(new Codes()
             {
                 c_email = user.c_email,
                 n_code = code,
@@ -110,7 +111,7 @@ public class EmailService : IEmailService
     {
         try
         {
-            var user = await Helpers.GetUserFromHeader(_dataBaseConnection, _httpContextAccessor);
+            var user = await Helpers.GetUserFromHeader(_databaseConnection, _httpContextAccessor);
 
             if (user == null)
                 throw new ArgumentException("USER_NOT_FOUND_PROBLEM");
@@ -126,7 +127,7 @@ public class EmailService : IEmailService
 
             invite.c_code = Helpers.ComputeHash(invite.id.ToString());
             
-            await _dataBaseConnection.TripInvites.AddAsync(invite);
+            await _databaseConnection.TripInvites.AddAsync(invite);
 
             string url = $"{ConfigurationHelper.GetBaseUrl()}:7111/EmailSender/SendInvite";
 

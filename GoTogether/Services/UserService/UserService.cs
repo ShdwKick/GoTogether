@@ -10,18 +10,18 @@ namespace Server.Services;
 public class UserService : IUserService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly DataBaseConnection _dataBaseConnection;
+    private readonly DatabaseConnection _databaseConnection;
 
-    public UserService(IHttpContextAccessor httpContextAccessor, DataBaseConnection dataBaseConnection)
+    public UserService(IHttpContextAccessor httpContextAccessor, DatabaseConnection databaseConnection)
     {
         _httpContextAccessor = httpContextAccessor;
-        _dataBaseConnection = dataBaseConnection;
+        _databaseConnection = databaseConnection;
     }
 
 
     public async Task<User> GetUserByToken()
     {
-        var userData = await Helpers.GetUserFromHeader(_dataBaseConnection, _httpContextAccessor);
+        var userData = await Helpers.GetUserFromHeader(_databaseConnection, _httpContextAccessor);
 
         User user = new User
         {
@@ -30,14 +30,14 @@ public class UserService : IUserService
             c_email = userData.c_email,
             b_is_mail_confirmed = userData.b_is_mail_confirmed,
             d_registration_date = userData.d_registration_date,
-            f_role = await _dataBaseConnection.Roles.FirstOrDefaultAsync(q => q.id == userData.f_role),
+            f_role = await _databaseConnection.Roles.FirstOrDefaultAsync(q => q.id == userData.f_role),
         };
         return user;
     }
 
     public async Task<User> GetUserById(Guid userId)
     {
-        var userData = await _dataBaseConnection.Users.FirstOrDefaultAsync(q => q.id == userId);
+        var userData = await _databaseConnection.Users.FirstOrDefaultAsync(q => q.id == userId);
         if (userData == null)
             throw new ArgumentException("USER_NOT_FOUND_PROBLEM");
 
@@ -48,14 +48,14 @@ public class UserService : IUserService
             c_email = userData.c_email,
             b_is_mail_confirmed = userData.b_is_mail_confirmed,
             d_registration_date = userData.d_registration_date,
-            f_role = await _dataBaseConnection.Roles.FirstOrDefaultAsync(q => q.id == userData.f_role),
+            f_role = await _databaseConnection.Roles.FirstOrDefaultAsync(q => q.id == userData.f_role),
         };
         return user;
     }
 
     public async Task<string> CreateUser(UserForCreate user, Guid? roleGuid = null)
     {
-        var usr = await _dataBaseConnection.Users.FirstOrDefaultAsync(q =>
+        var usr = await _databaseConnection.Users.FirstOrDefaultAsync(q =>
             q.c_email == user.c_email || q.c_nickname == user.c_nickname);
         if (usr != null)
         {
@@ -74,9 +74,9 @@ public class UserService : IUserService
             // c_google_token = user.c_google_token,
         };
 
-        var role = _dataBaseConnection.Roles.FirstOrDefault(q => q.id == roleGuid);
+        var role = _databaseConnection.Roles.FirstOrDefault(q => q.id == roleGuid);
         if (role == null)
-            role = await _dataBaseConnection.Roles.FirstOrDefaultAsync(q => q.c_dev_name == "User");
+            role = await _databaseConnection.Roles.FirstOrDefaultAsync(q => q.c_dev_name == "User");
         usr.f_role = role.id;
 
         var newToken = new AuthorizationToken();
@@ -84,10 +84,10 @@ public class UserService : IUserService
         newToken.c_hash = Helpers.ComputeHash(newToken.c_token);
         usr.f_authorization_token = (Guid)newToken.id;
 
-        await _dataBaseConnection.Authorization.AddAsync(newToken);
-        await _dataBaseConnection.Users.AddAsync(usr);
+        await _databaseConnection.Authorization.AddAsync(newToken);
+        await _databaseConnection.Users.AddAsync(usr);
 
-        await _dataBaseConnection.SaveChangesAsync();
+        await _databaseConnection.SaveChangesAsync();
 
         return newToken.c_token;
     }
@@ -96,7 +96,7 @@ public class UserService : IUserService
     {
         string passwordHash = Helpers.ComputeHash(password);
 
-        var user = await _dataBaseConnection.Users.FirstOrDefaultAsync(q =>
+        var user = await _databaseConnection.Users.FirstOrDefaultAsync(q =>
             q.c_email == login && q.c_password == passwordHash);
         if (user == null)
             throw new ArgumentException("USER_NOT_FOUND_PROBLEM");
@@ -109,13 +109,13 @@ public class UserService : IUserService
         var token = new JwtSecurityTokenHandler().WriteToken(Helpers.GenerateNewToken(user.id.ToString()));
 
         var authorizationToken =
-            await _dataBaseConnection.Authorization.FirstOrDefaultAsync(q => q.id == user.f_authorization_token);
+            await _databaseConnection.Authorization.FirstOrDefaultAsync(q => q.id == user.f_authorization_token);
         if (authorizationToken == null)
             throw new ArgumentException("TOKEN_GENERATION_PROBLEM");
 
         authorizationToken.c_token = token;
         authorizationToken.c_hash = Helpers.ComputeHash(authorizationToken.c_token);
-        await _dataBaseConnection.SaveChangesAsync();
+        await _databaseConnection.SaveChangesAsync();
 
         return token;
     }

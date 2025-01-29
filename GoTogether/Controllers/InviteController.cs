@@ -8,22 +8,22 @@ namespace GoTogether.Controlers;
 [Route("api/[controller]")]
 public class InviteController : ControllerBase
 {
-    private readonly DataBaseConnection _dataBaseConnection;
+    private readonly DatabaseConnection _databaseConnection;
 
-    public InviteController(DataBaseConnection dataBaseConnection)
+    public InviteController(DatabaseConnection databaseConnection)
     {
-        _dataBaseConnection = dataBaseConnection;
+        _databaseConnection = databaseConnection;
     }
 
 
     [HttpGet("invite/{token}")]
     public async Task<Trip> ProcessInvite(string token)
     {
-        var invite = await _dataBaseConnection.TripInvites.FirstOrDefaultAsync(q => q.c_code == token);
+        var invite = await _databaseConnection.TripInvites.FirstOrDefaultAsync(q => q.c_code == token);
         if(invite == null)
             throw new ArgumentException("INVALID_INVITE_CODE_PROBLEM");
         
-        var trip = await _dataBaseConnection.Trips.FirstOrDefaultAsync(q=>q.id == invite.f_trip_id);
+        var trip = await _databaseConnection.Trips.FirstOrDefaultAsync(q=>q.id == invite.f_trip_id);
         if(trip == null)
                 throw new ArgumentException("TRIP_NOT_FOUND_PROBLEM");
         

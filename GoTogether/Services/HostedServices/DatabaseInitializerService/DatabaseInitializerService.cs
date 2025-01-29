@@ -3,11 +3,11 @@ using Server.Data;
 
 namespace GoTogether.Services.DatabaseInitializerService;
 
-public class DataBaseInitializerService : IHostedService
+public class DatabaseInitializerService : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
 
-    public DataBaseInitializerService(IServiceProvider serviceProvider)
+    public DatabaseInitializerService(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }
@@ -15,25 +15,25 @@ public class DataBaseInitializerService : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         using var scope = _serviceProvider.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<DataBaseConnection>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseConnection>();
         await InitializeDataBase(dbContext);
     }
 
     public async Task StopAsync(CancellationToken cancellationToken) => await Task.CompletedTask;
     
     
-    private async Task InitializeDataBase(DataBaseConnection dataBaseConnection)
+    private async Task InitializeDataBase(DatabaseConnection databaseConnection)
     {
-        await InitializeRoles(dataBaseConnection);
-        await InitializeTripRoles(dataBaseConnection);
+        await InitializeRoles(databaseConnection);
+        await InitializeTripRoles(databaseConnection);
     }
 
-    private async Task InitializeRoles(DataBaseConnection dataBaseConnection)
+    private async Task InitializeRoles(DatabaseConnection databaseConnection)
     {
         bool isDataAdded = false;
-        if (await dataBaseConnection.Roles.FirstOrDefaultAsync(q => q.c_dev_name == "Admin") == null)
+        if (await databaseConnection.Roles.FirstOrDefaultAsync(q => q.c_dev_name == "Admin") == null)
         {
-            dataBaseConnection.Roles.Add(
+            databaseConnection.Roles.Add(
                 new Role
                 {
                     id = Guid.NewGuid(),
@@ -44,9 +44,9 @@ public class DataBaseInitializerService : IHostedService
             );
             isDataAdded = true;
         }
-        if (await dataBaseConnection.Roles.FirstOrDefaultAsync(q => q.c_dev_name == "User") == null)
+        if (await databaseConnection.Roles.FirstOrDefaultAsync(q => q.c_dev_name == "User") == null)
         {
-            dataBaseConnection.Roles.Add(
+            databaseConnection.Roles.Add(
                 new Role
                 {
                     id = Guid.NewGuid(),
@@ -59,15 +59,15 @@ public class DataBaseInitializerService : IHostedService
         }
 
         if (isDataAdded)
-            await dataBaseConnection.SaveChangesAsync();
+            await databaseConnection.SaveChangesAsync();
     }
     
-    private async Task InitializeTripRoles(DataBaseConnection dataBaseConnection)
+    private async Task InitializeTripRoles(DatabaseConnection databaseConnection)
     {
         bool isDataAdded = false;
-        if (await dataBaseConnection.TripRoles.FirstOrDefaultAsync(q => q.c_dev_name == "Admin") == null)
+        if (await databaseConnection.TripRoles.FirstOrDefaultAsync(q => q.c_dev_name == "Admin") == null)
         {
-            dataBaseConnection.TripRoles.Add(
+            databaseConnection.TripRoles.Add(
                 new TripRole
                 {
                     id = Guid.NewGuid(),
@@ -82,9 +82,9 @@ public class DataBaseInitializerService : IHostedService
             );
             isDataAdded = true;
         }
-        if (await dataBaseConnection.TripRoles.FirstOrDefaultAsync(q => q.c_dev_name == "User") == null)
+        if (await databaseConnection.TripRoles.FirstOrDefaultAsync(q => q.c_dev_name == "User") == null)
         {
-            dataBaseConnection.TripRoles.Add(
+            databaseConnection.TripRoles.Add(
                 new TripRole
                 {
                     id = Guid.NewGuid(),
@@ -100,6 +100,6 @@ public class DataBaseInitializerService : IHostedService
         }
 
         if (isDataAdded)
-            await dataBaseConnection.SaveChangesAsync();
+            await databaseConnection.SaveChangesAsync();
     }
 }

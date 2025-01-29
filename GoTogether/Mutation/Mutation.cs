@@ -16,17 +16,17 @@ namespace GoTogether
     public class Mutation
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly DataBaseConnection _dataBaseConnection;
+        private readonly DatabaseConnection _databaseConnection;
         private readonly IEmailService _emailService;
         private readonly IUserService _userService;
         private readonly ITripService _tripService;
 
 
-        public Mutation(IHttpContextAccessor httpContextAccessor, DataBaseConnection dataBaseConnection,
+        public Mutation(IHttpContextAccessor httpContextAccessor, DatabaseConnection databaseConnection,
             IEmailService emailService, IUserService userService, ITripService tripService)
         {
             _httpContextAccessor = httpContextAccessor;
-            _dataBaseConnection = dataBaseConnection;
+            _databaseConnection = databaseConnection;
             _emailService = emailService;
             _userService = userService;
             _tripService = tripService;
@@ -45,7 +45,7 @@ namespace GoTogether
         [GraphQLDescription("Отправляет на почту письмо для подтверждения почты, адрес берётся из jwt токена")]
         public async Task<bool> SendEmailConfirmationEmail()
         {
-            return await _emailService?.SendEmailConfirmationEMail();
+            return await _emailService?.SendEmailConfirmationEmail();
         }
 
         [GraphQLDescription("Мутация для создания пользователя, возвращает jwt токен")]
@@ -63,7 +63,7 @@ namespace GoTogether
         [GraphQLDescription("Мутация для создания новой поезки, возвращает полную информацию о поездке")]
         public async Task<Trip> CreateTrip(TripForCreate trip)
         {
-            var author = await Helpers.GetUserFromHeader(_dataBaseConnection, _httpContextAccessor);
+            var author = await Helpers.GetUserFromHeader(_databaseConnection, _httpContextAccessor);
 
             var newTrip = new Trip()
             {
@@ -75,9 +75,9 @@ namespace GoTogether
                 f_author = author.id,
             };
 
-            await _dataBaseConnection.Trips.AddAsync(newTrip);
+            await _databaseConnection.Trips.AddAsync(newTrip);
 
-            await _dataBaseConnection.SaveChangesAsync();
+            await _databaseConnection.SaveChangesAsync();
             return newTrip;
         }
 
@@ -116,8 +116,8 @@ namespace GoTogether
         [GraphQLDescription("Временная мутация для дропа бд пользователей :)")]
         public async Task DeleteAllUsers()
         {
-            _dataBaseConnection.Users.ExecuteDelete();
-            await _dataBaseConnection.SaveChangesAsync();
+            _databaseConnection.Users.ExecuteDelete();
+            await _databaseConnection.SaveChangesAsync();
         }
 
 
@@ -132,11 +132,11 @@ namespace GoTogether
             var claim = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub);
             if (claim == null) throw new ArgumentException("INVALID_TOKEN_CLAIMS_PROBLEM");
 
-            var user = await _dataBaseConnection.Users.FirstOrDefaultAsync(u => u.id.ToString() == claim.Value);
+            var user = await _databaseConnection.Users.FirstOrDefaultAsync(u => u.id.ToString() == claim.Value);
             if (user == null) throw new ArgumentException("TOKEN_GENERATION_USER_NOT_FOUND_PROBLEM");
 
             var authorizationToken =
-                await _dataBaseConnection.Authorization.FirstOrDefaultAsync(q => q.id == user.f_authorization_token);
+                await _databaseConnection.Authorization.FirstOrDefaultAsync(q => q.id == user.f_authorization_token);
             if (authorizationToken == null) throw new ArgumentException("OLD_TOKEN_NOT_FOUND_PROBLEM");
 
             if (Helpers.ComputeHash(oldToken) != authorizationToken.c_hash)
@@ -146,7 +146,7 @@ namespace GoTogether
             authorizationToken.c_token =
                 new JwtSecurityTokenHandler().WriteToken(Helpers.GenerateNewToken(user.id.ToString()));
             authorizationToken.c_hash = Helpers.ComputeHash(authorizationToken.c_token);
-            await _dataBaseConnection.SaveChangesAsync();
+            await _databaseConnection.SaveChangesAsync();
             return authorizationToken.c_token;
         }
 
@@ -156,11 +156,11 @@ namespace GoTogether
             "если всё ок то обновляется пароль и возвращается true, иначе экзепш в лицо")]
         public async Task<bool> PasswordRecovery(string email, string code, string newPassword)
         {
-            var user = await _dataBaseConnection.Users.FirstOrDefaultAsync(u => u.c_email == email);
+            var user = await _databaseConnection.Users.FirstOrDefaultAsync(u => u.c_email == email);
             if (user == null)
                 throw new ArgumentException("USER_NOT_FOUND_PROBLEM");
 
-            var recoveryCode = await _dataBaseConnection.RecoveryCodes.FirstOrDefaultAsync(u => u.c_email == email);
+            var recoveryCode = await _databaseConnection.RecoveryCodes.FirstOrDefaultAsync(u => u.c_email == email);
             if (recoveryCode == null)
                 throw new ArgumentException("RECOVERY_CODE_NOT_FOUND_PROBLEM");
 
@@ -171,7 +171,7 @@ namespace GoTogether
                 throw new ArgumentException("RECOVERY_CODE_NOT_CORRECT_PROBLEM");
 
             user.c_password = Helpers.ComputeHash(newPassword);
-            await _dataBaseConnection.SaveChangesAsync();
+            await _databaseConnection.SaveChangesAsync();
             return true;
         }
 
@@ -179,14 +179,14 @@ namespace GoTogether
         [GraphQLDescription("AUTHORIZE- Мутация для обновления пароля, true если всё прошло хорошо")]
         public async Task<bool> RefreshPassword(string oldPassword, string newPassword)
         {
-            var user = await Helpers.GetUserFromHeader(_dataBaseConnection, _httpContextAccessor);
+            var user = await Helpers.GetUserFromHeader(_databaseConnection, _httpContextAccessor);
 
             var oldPasswordHash = Helpers.ComputeHash(oldPassword);
             if (oldPasswordHash != user.c_password)
                 throw new ArgumentException("OLD_PASSWORD_NOT_CORRECT_PROBLEM");
 
             user.c_password = Helpers.ComputeHash(newPassword);
-            await _dataBaseConnection.SaveChangesAsync();
+            await _databaseConnection.SaveChangesAsync();
             return true;
         }
 

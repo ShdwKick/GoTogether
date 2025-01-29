@@ -6,11 +6,11 @@ namespace GoTogether
 {
     public class Subsription
     {
-        private readonly DataBaseConnection _dataBaseConnection;
+        private readonly DatabaseConnection _databaseConnection;
 
-        public Subsription(DataBaseConnection dataBaseConnection)
+        public Subsription(DatabaseConnection databaseConnection)
         {
-            _dataBaseConnection = dataBaseConnection;
+            _databaseConnection = databaseConnection;
         }
 
         [Subscribe(With = nameof(SubscribeToMessagesByChatId))]

@@ -11,6 +11,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using GoTogether.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -72,7 +73,7 @@ namespace Server.Data.Helpers
             return newToken;
         }
 
-        public static async Task<UserData> GetUserFromHeader(DataBaseConnection db,
+        public static async Task<UserData> GetUserFromHeader(DatabaseConnection db,
             IHttpContextAccessor httpContextAccessor)
         {
             var token = GetTokenFromHeader(httpContextAccessor);

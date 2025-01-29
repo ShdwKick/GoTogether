@@ -1,7 +1,9 @@
 ﻿using System.Text;
+using GoTogether.Data;
 using GoTogether.Services.DatabaseInitializerService;
 using GoTogether.Services.PlaceService;
 using GoTogether.Services.RecoveryService;
+using GoTogether.Services.RoleService;
 using GoTogether.Services.TripService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.WebSockets;
@@ -17,28 +19,29 @@ namespace GoTogether
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            #if DEBUG
-                builder.Configuration.AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true);
-            #else
+#if DEBUG
+            builder.Configuration.AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true);
+#else
                 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-            #endif
+#endif
 
             // Настройка авторизации
             builder.Services.AddAuthorization();
-            
+
 
             builder.Services.AddScoped<Query>();
             builder.Services.AddScoped<Mutation>();
             builder.Services.AddScoped<Subsription>();
-            builder.Services.AddScoped<DataBaseConnection>();
+            builder.Services.AddScoped<DatabaseConnection>();
 
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<ITripService, TripService>();
             builder.Services.AddScoped<IPlaceService, PlaceService>();
+            builder.Services.AddScoped<IRoleService, RoleService>();
             builder.Services.AddSingleton(new ConfigurationHelper(builder.Configuration));
 
-            builder.Services.AddHostedService<DataBaseInitializerService>();
+            builder.Services.AddHostedService<DatabaseInitializerService>();
 
             builder.Services.AddHttpClient();
             builder.Services.AddHttpContextAccessor();
@@ -92,11 +95,11 @@ namespace GoTogether
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseWebSockets();
-            
-            
+
+
             app.MapGraphQL();
             //app.MapControllers();
-            
+
 
             app.Run();
         }

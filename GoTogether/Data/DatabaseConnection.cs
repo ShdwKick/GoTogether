@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Server.Data;
 
-public class DataBaseConnection : DbContext
+public class DatabaseConnection : DbContext
 {
     public DbSet<UserData> Users { get; set; }
     public DbSet<AuthorizationToken> Authorization { get; set; }
@@ -22,7 +22,7 @@ public class DataBaseConnection : DbContext
 
     private readonly string _connectionString;
 
-    public DataBaseConnection(IConfiguration config)
+    public DatabaseConnection(IConfiguration config)
     {
         _connectionString = config.GetSection("AppSettings:DefaultConnection").Value;
         //подключение к бд

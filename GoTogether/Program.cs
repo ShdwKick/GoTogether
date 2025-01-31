@@ -49,6 +49,14 @@ namespace GoTogether
             builder.Services.AddWebSockets(options => { options.KeepAliveInterval = TimeSpan.FromSeconds(120); });
 
             builder.Services.AddGraphQLServer()
+                .ModifyRequestOptions(options =>
+                {
+                    //ограничение на сложность запроса
+                    options.Complexity.Enable = true;
+                    options.Complexity.MaximumAllowed = 100;
+                    //ограничение на максимальное время запроса
+                    options.ExecutionTimeout = TimeSpan.FromSeconds(60);
+                })
                 .AddQueryType<Query>()
                 .AddMutationType<Mutation>()
                 .AddSubscriptionType<Subsription>()
@@ -100,6 +108,28 @@ namespace GoTogether
             app.MapGraphQL();
             //app.MapControllers();
 
+            //set response max size limits 
+            app.Use(async (context, next) =>
+            {
+                var originalBody = context.Response.Body;
+                await using var limitedStream = new MemoryStream();
+                context.Response.Body = limitedStream;
+
+                await next();
+
+                if (limitedStream.Length > (1024 * 1024) * 3) // 3MB
+                {
+                    context.Response.StatusCode = StatusCodes.Status413RequestEntityTooLarge;
+                    await context.Response.WriteAsync("Response too large");
+                }
+                else
+                {
+                    limitedStream.Seek(0, SeekOrigin.Begin);
+                    await limitedStream.CopyToAsync(originalBody);
+                }
+
+                context.Response.Body = originalBody;
+            });
 
             app.Run();
         }

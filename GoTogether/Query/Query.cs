@@ -46,6 +46,7 @@ namespace GoTogether
         }
 
         [Authorize]
+        [UsePaging(MaxPageSize = 10,IncludeTotalCount = true)]
         [GraphQLDescription("AUTHORIZE-Получить данные о всех поездках человека по его id")]
         public async Task<List<Trip>> GetUserTrips(Guid userId)
         {

@@ -74,6 +74,7 @@ public class UserService : IUserService
             // c_google_token = user.c_google_token,
         };
 
+
         var role = _databaseConnection.Roles.FirstOrDefault(q => q.id == roleGuid);
         if (role == null)
             role = await _databaseConnection.Roles.FirstOrDefaultAsync(q => q.c_dev_name == "User");

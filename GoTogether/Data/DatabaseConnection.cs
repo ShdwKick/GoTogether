@@ -27,9 +27,9 @@ public class DatabaseConnection : DbContext
         _connectionString = config.GetSection("AppSettings:DefaultConnection").Value;
         //подключение к бд
 
-#if DEBUG
-        Database.EnsureDeleted();
-#endif
+// #if DEBUG
+//         Database.EnsureDeleted();
+// #endif
         Database.EnsureCreated();
     }
 

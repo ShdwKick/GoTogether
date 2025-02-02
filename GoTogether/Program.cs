@@ -20,14 +20,15 @@ namespace GoTogether
             var builder = WebApplication.CreateBuilder(args);
 
 #if DEBUG
-            builder.Configuration.AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true);
+            builder.Configuration.AddJsonFile("Properties/appsettings.Development.json", optional: false, reloadOnChange: true);
 #else
-                builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                builder.Configuration.AddJsonFile("Properties/appsettings.json", optional: false, reloadOnChange: true);
 #endif
 
             // Настройка авторизации
             builder.Services.AddAuthorization();
 
+            builder.Services.AddHostedService<DatabaseInitializerService>();
 
             builder.Services.AddScoped<Query>();
             builder.Services.AddScoped<Mutation>();
@@ -41,7 +42,6 @@ namespace GoTogether
             builder.Services.AddScoped<IRoleService, RoleService>();
             builder.Services.AddSingleton(new ConfigurationHelper(builder.Configuration));
 
-            builder.Services.AddHostedService<DatabaseInitializerService>();
 
             builder.Services.AddHttpClient();
             builder.Services.AddHttpContextAccessor();

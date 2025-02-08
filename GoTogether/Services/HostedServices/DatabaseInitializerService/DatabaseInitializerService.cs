@@ -31,10 +31,10 @@ public class DatabaseInitializerService : IHostedService
     private async Task InitializeRoles(DatabaseConnection databaseConnection)
     {
         bool isDataAdded = false;
-        if (await databaseConnection.Roles.FirstOrDefaultAsync(q => q.c_dev_name == "Admin") == null)
+        if (await databaseConnection.UserRoles.FirstOrDefaultAsync(q => q.c_dev_name == "Admin") == null)
         {
-            databaseConnection.Roles.Add(
-                new Role
+            databaseConnection.UserRoles.Add(
+                new UserRole
                 {
                     id = Guid.NewGuid(),
                     c_name = "Admin",
@@ -44,10 +44,10 @@ public class DatabaseInitializerService : IHostedService
             );
             isDataAdded = true;
         }
-        if (await databaseConnection.Roles.FirstOrDefaultAsync(q => q.c_dev_name == "User") == null)
+        if (await databaseConnection.UserRoles.FirstOrDefaultAsync(q => q.c_dev_name == "User") == null)
         {
-            databaseConnection.Roles.Add(
-                new Role
+            databaseConnection.UserRoles.Add(
+                new UserRole
                 {
                     id = Guid.NewGuid(),
                     c_name = "User",

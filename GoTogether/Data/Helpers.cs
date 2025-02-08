@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using GoTogether.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using KeyNotFoundException = System.Collections.Generic.KeyNotFoundException;
 
 namespace Server.Data.Helpers
 {
@@ -100,7 +101,7 @@ namespace Server.Data.Helpers
 
         public static int GenerateCode() => new Random().Next(100000, 999999);
 
-        public static StringContent GenerateEmailCodeJson(string address, int code = -1)
+        public static StringContent GenerateEmailCodeJson(string email, int code = -1)
         {
             if (code < 0)
                 code = GenerateCode();
@@ -108,20 +109,20 @@ namespace Server.Data.Helpers
             return new StringContent(
                 JsonSerializer.Serialize(new
                 {
-                    address = address,
+                    address = email,
                     code = code.ToString()
                 }),
                 Encoding.UTF8, "application/json"
             );
         }
 
-        public static StringContent GenerateInviteMessageBodyJson(string address, string code)
+        public static StringContent GenerateInviteMessageBodyJson(string email, string code)
         {
             return new StringContent(
                 JsonSerializer.Serialize(new
                 {
-                    address = address,
-                    code = code
+                    address = email,
+                    code
                 }),
                 Encoding.UTF8, "application/json");
         }

@@ -1,7 +1,8 @@
 ﻿using System.Text;
 using GoTogether.Data;
+using GoTogether.Repositories;
+using GoTogether.Repositories.TripRepositories;
 using GoTogether.Services.DatabaseInitializerService;
-using GoTogether.Services.PlaceService;
 using GoTogether.Services.RecoveryService;
 using GoTogether.Services.RoleService;
 using GoTogether.Services.TripService;
@@ -27,6 +28,10 @@ namespace GoTogether
 
             // Настройка авторизации
             builder.Services.AddAuthorization();
+            builder.Services.AddHttpClient();
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddMemoryCache();
+            builder.Services.AddWebSockets(options => { options.KeepAliveInterval = TimeSpan.FromSeconds(120); });
 
             builder.Services.AddHostedService<DatabaseInitializerService>();
 
@@ -34,26 +39,24 @@ namespace GoTogether
             builder.Services.AddScoped<Mutation>();
             builder.Services.AddScoped<Subsription>();
             builder.Services.AddScoped<DatabaseConnection>();
+            
+            builder.Services.AddScoped<ITripRepository, TripRepository>();
+            builder.Services.AddScoped<ICountryRepository, CountryRepository>();
+            builder.Services.AddScoped<ICityRepository, CityRepository>();
+            builder.Services.AddScoped<ILandmarkRepository, LandmarkRepository>();
 
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<ITripService, TripService>();
-            builder.Services.AddScoped<IPlaceService, PlaceService>();
             builder.Services.AddScoped<IRoleService, RoleService>();
             builder.Services.AddSingleton(new ConfigurationHelper(builder.Configuration));
 
 
-            builder.Services.AddHttpClient();
-            builder.Services.AddHttpContextAccessor();
-            builder.Services.AddMemoryCache();
-            builder.Services.AddWebSockets(options => { options.KeepAliveInterval = TimeSpan.FromSeconds(120); });
+            
 
             builder.Services.AddGraphQLServer()
                 .ModifyRequestOptions(options =>
                 {
-                    //ограничение на сложность запроса
-                    options.Complexity.Enable = true;
-                    options.Complexity.MaximumAllowed = 100;
                     //ограничение на максимальное время запроса
                     options.ExecutionTimeout = TimeSpan.FromSeconds(60);
                 })
@@ -91,7 +94,7 @@ namespace GoTogether
 
             builder.WebHost.ConfigureKestrel(options =>
             {
-                options.ListenAnyIP(5000);
+                options.ListenAnyIP(5012);
                 options.ListenAnyIP(5001, listenOptions => { listenOptions.UseHttps(); });
             });
 

@@ -97,6 +97,7 @@ public class EmailService : IEmailService
         }
     }
 
+    //TODO: переделать под rabbit
     public async Task SendMessage(string url, StringContent body)
     {
         if(string.IsNullOrWhiteSpace(url))

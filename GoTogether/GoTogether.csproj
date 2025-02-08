@@ -7,13 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HotChocolate" Version="14.0.0-p.39" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="13.9.11" />
-    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="14.0.0-p.39" />
-    <PackageReference Include="HotChocolate.Subscriptions.InMemory" Version="13.9.11" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
+    <PackageReference Include="HotChocolate" Version="15.0.0-rc.1.4" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="15.0.0-rc.1.4" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="15.0.0-rc.1.4" />
+    <PackageReference Include="HotChocolate.Subscriptions.InMemory" Version="15.0.0-rc.1.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\RabbitService\" />
   </ItemGroup>
 
 </Project>

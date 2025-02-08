@@ -60,25 +60,10 @@ namespace GoTogether
             return await _userService.LoginUser(login, password);
         }
 
-        [GraphQLDescription("Мутация для создания новой поезки, возвращает полную информацию о поездке")]
+        [GraphQLDescription("Мутация для создания новой поезки, возвращает основную информацию о поездке")]
         public async Task<Trip> CreateTrip(TripForCreate trip)
         {
-            var author = await Helpers.GetUserFromHeader(_databaseConnection, _httpContextAccessor);
-
-            var newTrip = new Trip()
-            {
-                id = Guid.NewGuid(),
-                c_name = trip.c_name,
-                c_description = trip.c_description,
-                d_start_date = trip.d_start_date,
-                d_end_date = trip.d_end_date,
-                f_author = author.id,
-            };
-
-            await _databaseConnection.Trips.AddAsync(newTrip);
-
-            await _databaseConnection.SaveChangesAsync();
-            return newTrip;
+            return await _tripService.CreateTrip(trip);
         }
 
         // public async Task<string> LoginViaVK(string vk_token)
@@ -136,7 +121,7 @@ namespace GoTogether
             if (user == null) throw new ArgumentException("TOKEN_GENERATION_USER_NOT_FOUND_PROBLEM");
 
             var authorizationToken =
-                await _databaseConnection.Authorization.FirstOrDefaultAsync(q => q.id == user.f_authorization_token);
+                await _databaseConnection.AuthorizationTokens.FirstOrDefaultAsync(q => q.id == user.f_authorization_token);
             if (authorizationToken == null) throw new ArgumentException("OLD_TOKEN_NOT_FOUND_PROBLEM");
 
             if (Helpers.ComputeHash(oldToken) != authorizationToken.c_hash)

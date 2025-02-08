@@ -16,21 +16,21 @@ public class RoleService : IRoleService
     }
 
 
-    public async Task<List<Role>> GetUserRoles()
+    public async Task<List<UserRole>> GetUserRoles()
     {
-        if (_memoryCache.TryGetValue("UserRoles", out List<Role> roles))
+        if (_memoryCache.TryGetValue("UserRoles", out List<UserRole> roles))
         {
             if (roles == null || roles.Any())
                 return roles;
 
-            roles = await _databaseConnection.Roles.ToListAsync();
+            roles = await _databaseConnection.UserRoles.ToListAsync();
             _memoryCache.Set("UserRoles", roles,
                 new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromDays(2)));
             return roles;
         }
         else
         {
-            roles = await _databaseConnection.Roles.ToListAsync();
+            roles = await _databaseConnection.UserRoles.ToListAsync();
             _memoryCache.Set("UserRoles", roles,
                 new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromDays(2)));
             return roles;

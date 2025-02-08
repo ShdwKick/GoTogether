@@ -30,7 +30,7 @@ public class UserService : IUserService
             c_email = userData.c_email,
             b_is_mail_confirmed = userData.b_is_mail_confirmed,
             d_registration_date = userData.d_registration_date,
-            f_role = await _databaseConnection.Roles.FirstOrDefaultAsync(q => q.id == userData.f_role),
+            FUserRole = await _databaseConnection.UserRoles.FirstOrDefaultAsync(q => q.id == userData.f_role),
         };
         return user;
     }
@@ -48,7 +48,7 @@ public class UserService : IUserService
             c_email = userData.c_email,
             b_is_mail_confirmed = userData.b_is_mail_confirmed,
             d_registration_date = userData.d_registration_date,
-            f_role = await _databaseConnection.Roles.FirstOrDefaultAsync(q => q.id == userData.f_role),
+            FUserRole = await _databaseConnection.UserRoles.FirstOrDefaultAsync(q => q.id == userData.f_role),
         };
         return user;
     }
@@ -75,9 +75,9 @@ public class UserService : IUserService
         };
 
 
-        var role = _databaseConnection.Roles.FirstOrDefault(q => q.id == roleGuid);
+        var role = _databaseConnection.UserRoles.FirstOrDefault(q => q.id == roleGuid);
         if (role == null)
-            role = await _databaseConnection.Roles.FirstOrDefaultAsync(q => q.c_dev_name == "User");
+            role = await _databaseConnection.UserRoles.FirstOrDefaultAsync(q => q.c_dev_name == "User");
         usr.f_role = role.id;
 
         var newToken = new AuthorizationToken();
@@ -85,7 +85,7 @@ public class UserService : IUserService
         newToken.c_hash = Helpers.ComputeHash(newToken.c_token);
         usr.f_authorization_token = (Guid)newToken.id;
 
-        await _databaseConnection.Authorization.AddAsync(newToken);
+        await _databaseConnection.AuthorizationTokens.AddAsync(newToken);
         await _databaseConnection.Users.AddAsync(usr);
 
         await _databaseConnection.SaveChangesAsync();
@@ -110,7 +110,7 @@ public class UserService : IUserService
         var token = new JwtSecurityTokenHandler().WriteToken(Helpers.GenerateNewToken(user.id.ToString()));
 
         var authorizationToken =
-            await _databaseConnection.Authorization.FirstOrDefaultAsync(q => q.id == user.f_authorization_token);
+            await _databaseConnection.AuthorizationTokens.FirstOrDefaultAsync(q => q.id == user.f_authorization_token);
         if (authorizationToken == null)
             throw new ArgumentException("TOKEN_GENERATION_PROBLEM");
 

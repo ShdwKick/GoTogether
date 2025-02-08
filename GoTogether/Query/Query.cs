@@ -74,7 +74,7 @@ namespace GoTogether
         }
 
         [GraphQLDescription("AUTHORIZE- Получить список пользовательских ролей")]
-        public async Task<List<Role>> GetUserRoles()
+        public async Task<List<UserRole>> GetUserRoles()
         {
             return await _roleService.GetUserRoles();
         }

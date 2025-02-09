@@ -10,8 +10,8 @@ public class DatabaseConnection : DbContext
     public DbSet<Codes> RecoveryCodes { get; set; }
     public DbSet<Codes> ConfirmationCodes { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
-    public DbSet<TripRole> TripRoles { get; set; }
     
+    public DbSet<TripRole> TripRoles { get; set; }
     public DbSet<Trip> Trips { get; set; }
     public DbSet<UserTrips> UserTrips { get; set; }
     public DbSet<TripInvites> TripInvites { get; set; }

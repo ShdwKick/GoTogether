@@ -2,6 +2,7 @@
 using GoTogether.Data;
 using GoTogether.Repositories;
 using GoTogether.Repositories.TripRepositories;
+using GoTogether.Repositories.UserRepository;
 using GoTogether.Services.DatabaseInitializerService;
 using GoTogether.Services.RecoveryService;
 using GoTogether.Services.RoleService;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.WebSockets;
 using Microsoft.IdentityModel.Tokens;
 using Server.Data;
+using Server.Data.Helpers;
 using Server.Services;
 
 namespace GoTogether
@@ -40,6 +42,7 @@ namespace GoTogether
             builder.Services.AddScoped<Subsription>();
             builder.Services.AddScoped<DatabaseConnection>();
             
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<ITripRepository, TripRepository>();
             builder.Services.AddScoped<ICountryRepository, CountryRepository>();
             builder.Services.AddScoped<ICityRepository, CityRepository>();
@@ -133,6 +136,8 @@ namespace GoTogether
 
                 context.Response.Body = originalBody;
             });
+            
+            Helpers.InitializeServiceProvider(app.Services);
 
             app.Run();
         }

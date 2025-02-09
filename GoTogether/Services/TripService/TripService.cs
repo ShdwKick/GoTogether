@@ -1,5 +1,6 @@
 ﻿using GoTogether.Repositories;
 using GoTogether.Repositories.TripRepositories;
+using GoTogether.Repositories.UserRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Server.Data;
@@ -10,7 +11,7 @@ namespace GoTogether.Services.TripService;
 
 public class TripService : ITripService
 {
-    private readonly IUserService _userService;
+    private readonly IUserRepository _userRepository;
     private readonly ITripRepository _tripRepository;
     private readonly DatabaseConnection _databaseConnection;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -19,11 +20,11 @@ public class TripService : ITripService
     private readonly ICityRepository _cityRepository;
     private readonly ILandmarkRepository _landmarkRepository;
 
-    public TripService(IUserService userService, DatabaseConnection databaseConnection,
+    public TripService(IUserRepository userRepository, DatabaseConnection databaseConnection,
         IHttpContextAccessor httpContextAccessor, ITripRepository tripRepository, IMemoryCache memoryCache,
         ICountryRepository countryRepository, ICityRepository cityRepository, ILandmarkRepository landmarkRepository)
     {
-        _userService = userService;
+        _userRepository = userRepository;
         _databaseConnection = databaseConnection;
         _httpContextAccessor = httpContextAccessor;
         _tripRepository = tripRepository;
@@ -48,6 +49,24 @@ public class TripService : ITripService
         _memoryCache.Set($"trip{tripId}", trip,
             new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(15)));
         return trip;
+    }
+
+    public async Task<FullTripData> GetFullTripInfo(Guid tripId)
+    {
+        if (tripId == Guid.Empty)
+            throw new ArgumentException("INVALID_TRIP_ID_PROBLEM");
+
+        var trip = await GetTripInfo(tripId);
+
+        var fullData = new FullTripData()
+        {
+            id = trip.id,
+            Name = trip.c_name,
+            Description = trip.c_description,
+            User = await _userRepository.GetUserAsync(trip.f_author),
+        };
+        
+        return fullData;
     }
 
     public async Task<List<Trip>> GetUserTrips(Guid userId)
@@ -75,13 +94,13 @@ public class TripService : ITripService
 
     public async Task<Trip> CreateTrip(TripForCreate trip)
     {
-        var author = await Helpers.GetUserFromHeader(_databaseConnection, _httpContextAccessor);
+        var author = await Helpers.GetUserFromHeader();
         if (author == null)
             throw new ArgumentException("USER_NOT_FOUND_PROBLEM");
-        
-        if(string.IsNullOrEmpty(trip.c_name))
+
+        if (string.IsNullOrEmpty(trip.c_name))
             throw new ArgumentException("INVALID_TRIP_NAME_PROBLEM");
-        if(trip.d_start_date > trip.d_end_date)
+        if (trip.d_start_date > trip.d_end_date)
             throw new ArgumentException("INVALID_TRIP_DATES_PROBLEM");
 
         var newTrip = new Trip()

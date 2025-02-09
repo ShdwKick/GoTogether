@@ -31,6 +31,8 @@ public class DatabaseInitializerService : IHostedService
     private async Task InitializeRoles(DatabaseConnection databaseConnection)
     {
         bool isDataAdded = false;
+        
+        //TODO: брать роли из отдельного json файла
         if (await databaseConnection.UserRoles.FirstOrDefaultAsync(q => q.c_dev_name == "Admin") == null)
         {
             databaseConnection.UserRoles.Add(
@@ -65,6 +67,7 @@ public class DatabaseInitializerService : IHostedService
     private async Task InitializeTripRoles(DatabaseConnection databaseConnection)
     {
         bool isDataAdded = false;
+        //TODO: брать роли из отдельного json файла
         if (await databaseConnection.TripRoles.FirstOrDefaultAsync(q => q.c_dev_name == "Admin") == null)
         {
             databaseConnection.TripRoles.Add(

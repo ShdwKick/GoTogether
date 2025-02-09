@@ -19,12 +19,8 @@
         public DateTimeOffset d_registration_date { get; set; }
         public Guid f_authorization_token { get; set; }
         public Guid f_role { get; set; }
-        public UserRole UserRole { get; set; }
 
         public bool b_is_mail_confirmed { get; set; }
-        // public string c_yandex_token { get; set; }
-        // public string c_vk_token { get; set; }
-        // public string c_google_token { get; set; }
 
         public UserData()
         {
@@ -34,28 +30,24 @@
 
     public class User
     {
-        public Guid? id { get; set; }
-        public string c_nickname { get; set; }
-        public string c_email { get; set; }
-        public DateTimeOffset d_registration_date { get; set; }
-        public UserRole FUserRole { get; set; }
-        public bool b_is_mail_confirmed { get; set; }
+        public Guid? Id { get; set; }
+        public string Nickname { get; set; }
+        public string Email { get; set; }
+        public DateTimeOffset RegistrationDate { get; set; }
+        public UserRole Role { get; set; }
+        public bool IsEmailConfirmed { get; set; }
 
         public User()
         {
-            id = Guid.NewGuid();
+            Id = Guid.NewGuid();
         }
     }
 
     public class UserForCreate
     {
-        public string c_nickname { get; set; }
-        public string c_email { get; set; }
-
-        public string c_password { get; set; }
-        //public string c_yandex_token { get; set; }
-        //public string c_vk_token { get; set; }
-        //public string c_google_token { get; set; }
+        public string Nickname { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
     }
 
     public class UserRole
@@ -130,6 +122,19 @@
         public DateOnly d_start_date { get; set; }
         public DateOnly d_end_date { get; set; }
         public Guid f_author { get; set; }
+    }
+    
+    public class FullTripData
+    {
+        public Guid id { get; set; }
+        public string Name { get; set; }
+        public string? Description { get; set; }
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
+        public User User { get; set; }
+        public List<Country>? Countries { get; set; }
+        public List<City>? Cities { get; set; }
+        public List<Landmark>? Landmarks { get; set; }
     }
 
     public class TripForCreate
@@ -207,7 +212,7 @@
         public Guid f_country_id { get; set; }
         public Guid? f_city_id { get; set; }
         public string c_name { get; set; }
-        public string c_description { get; set; }
+        public string? c_description { get; set; }
         public string c_address { get; set; }
         public double n_latitude { get; set; } // Широта
         public double n_longitude { get; set; } // Долгота

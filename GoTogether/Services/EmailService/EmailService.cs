@@ -64,7 +64,7 @@ public class EmailService : IEmailService
     {
         try
         {
-            var user = await Helpers.GetUserFromHeader(_databaseConnection, _httpContextAccessor);
+            var user = await Helpers.GetUserFromHeader();
 
             if (user == null)
                 throw new ArgumentException("USER_NOT_FOUND_PROBLEM");
@@ -112,7 +112,7 @@ public class EmailService : IEmailService
     {
         try
         {
-            var user = await Helpers.GetUserFromHeader(_databaseConnection, _httpContextAccessor);
+            var user = await Helpers.GetUserFromHeader();
 
             if (user == null)
                 throw new ArgumentException("USER_NOT_FOUND_PROBLEM");

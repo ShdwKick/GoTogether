@@ -12,16 +12,27 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GoTogether.Data;
+using GoTogether.Repositories.UserRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using KeyNotFoundException = System.Collections.Generic.KeyNotFoundException;
 
 namespace Server.Data.Helpers
 {
-    public class Helpers
+    public static class Helpers
     {
-        public static string GetTokenFromHeader(IHttpContextAccessor httpContextAccessor)
+        private static IServiceProvider _serviceProvider;
+
+        public static void InitializeServiceProvider(IServiceProvider serviceProvider)
         {
+            _serviceProvider = serviceProvider;
+        }
+
+        public static string GetTokenFromHeader()
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var httpContextAccessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
+            
             if (httpContextAccessor == null)
                 throw new ArgumentException("ERROR_OCCURRED");
 
@@ -54,7 +65,7 @@ namespace Server.Data.Helpers
         }
 
 
-        public static JwtSecurityToken GenerateNewToken(string userId)
+        public static JwtSecurityToken GenerateNewToken(string userId, string userRole)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ConfigurationHelper.GetServerKey()));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -63,6 +74,7 @@ namespace Server.Data.Helpers
             {
                 new Claim(JwtRegisteredClaimNames.Sub, userId),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.Role, userRole)
             };
             var newToken = new JwtSecurityToken(
                 issuer: ConfigurationHelper.GetIssuer(),
@@ -74,10 +86,12 @@ namespace Server.Data.Helpers
             return newToken;
         }
 
-        public static async Task<UserData> GetUserFromHeader(DatabaseConnection db,
-            IHttpContextAccessor httpContextAccessor)
+        public static async Task<UserData> GetUserFromHeader()
         {
-            var token = GetTokenFromHeader(httpContextAccessor);
+            using var scope = _serviceProvider.CreateScope();
+            var userRepo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+            
+            var token = GetTokenFromHeader();
             if (string.IsNullOrWhiteSpace(token))
                 throw new ArgumentException("AUTH_TOKEN_MISSING_PROBLEM", nameof(token));
 
@@ -92,7 +106,7 @@ namespace Server.Data.Helpers
             if (!Guid.TryParse(claim.Value, out var userId))
                 throw new ArgumentException("AUTH_TOKEN_CLAIM_INVALID");
 
-            var user = await db.Users.FirstOrDefaultAsync(u => u.id == userId);
+            var user = await userRepo.GetUserDataAsync(userId);
             if (user == null)
                 throw new KeyNotFoundException("USER_NOT_FOUND_PROBLEM");
 

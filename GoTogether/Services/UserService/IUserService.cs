@@ -11,5 +11,5 @@ public interface IUserService
 
     Task<string> CreateUser(UserForCreate user, Guid? roleGuid);
     Task<string> LoginUser(string login, string password);
-    
+    Task<User> GetUserFromUserData(UserData userData);
 }

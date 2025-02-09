@@ -6,7 +6,10 @@ using Microsoft.EntityFrameworkCore;
 using Server.Data;
 using Server.Data.Helpers;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Xml.Linq;
+using GoTogether.Repositories.RoleRepositories.UserRoleRepository;
+using GoTogether.Repositories.UserRepository;
 using GoTogether.Services.RecoveryService;
 using GoTogether.Services.TripService;
 using Server.Services;
@@ -20,16 +23,21 @@ namespace GoTogether
         private readonly IEmailService _emailService;
         private readonly IUserService _userService;
         private readonly ITripService _tripService;
+        private readonly IUserRoleRepository _userRoleRepository;
+        private readonly IUserRepository _userRepository;
 
 
         public Mutation(IHttpContextAccessor httpContextAccessor, DatabaseConnection databaseConnection,
-            IEmailService emailService, IUserService userService, ITripService tripService)
+            IEmailService emailService, IUserService userService, ITripService tripService,
+            UserRoleRepository userRoleRepository, IUserRepository userRepository)
         {
             _httpContextAccessor = httpContextAccessor;
             _databaseConnection = databaseConnection;
             _emailService = emailService;
             _userService = userService;
             _tripService = tripService;
+            _userRoleRepository = userRoleRepository;
+            _userRepository = userRepository;
         }
 
 
@@ -111,6 +119,7 @@ namespace GoTogether
             "если всё хорошо то отправляет новый токен, иначе ловишь ошибку в лицо")]
         public async Task<string> TryRefreshToken(string oldToken)
         {
+            //TODO: отрефакторить код
             var jwtToken = new JwtSecurityTokenHandler().ReadToken(oldToken) as JwtSecurityToken;
             if (jwtToken == null) throw new ArgumentException("INVALID_TOKEN_PROBLEM");
 
@@ -121,15 +130,21 @@ namespace GoTogether
             if (user == null) throw new ArgumentException("TOKEN_GENERATION_USER_NOT_FOUND_PROBLEM");
 
             var authorizationToken =
-                await _databaseConnection.AuthorizationTokens.FirstOrDefaultAsync(q => q.id == user.f_authorization_token);
+                await _databaseConnection.AuthorizationTokens.FirstOrDefaultAsync(q =>
+                    q.id == user.f_authorization_token);
             if (authorizationToken == null) throw new ArgumentException("OLD_TOKEN_NOT_FOUND_PROBLEM");
 
             if (Helpers.ComputeHash(oldToken) != authorizationToken.c_hash)
                 throw new ArgumentException("CORRUPTED_TOKEN_DETECTED_PROBLEM");
 
+            var userRole = await _userRoleRepository.GetRoleAsync(user.f_role);
+            if (userRole == null)
+                throw new ArgumentException("INVALID_USER_ROLE_PROBLEM");
 
             authorizationToken.c_token =
-                new JwtSecurityTokenHandler().WriteToken(Helpers.GenerateNewToken(user.id.ToString()));
+                new JwtSecurityTokenHandler().WriteToken(Helpers.GenerateNewToken(user.id.ToString(),
+                    jwtToken.Claims.FirstOrDefault(q => q.Type == ClaimTypes.Role).Value));
+
             authorizationToken.c_hash = Helpers.ComputeHash(authorizationToken.c_token);
             await _databaseConnection.SaveChangesAsync();
             return authorizationToken.c_token;
@@ -164,7 +179,7 @@ namespace GoTogether
         [GraphQLDescription("AUTHORIZE- Мутация для обновления пароля, true если всё прошло хорошо")]
         public async Task<bool> RefreshPassword(string oldPassword, string newPassword)
         {
-            var user = await Helpers.GetUserFromHeader(_databaseConnection, _httpContextAccessor);
+            var user = await Helpers.GetUserFromHeader();
 
             var oldPasswordHash = Helpers.ComputeHash(oldPassword);
             if (oldPasswordHash != user.c_password)

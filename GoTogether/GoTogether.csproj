@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Repositories\RoleRepositories\TripRoleRepository\" />
     <Folder Include="Services\RabbitService\" />
   </ItemGroup>
 

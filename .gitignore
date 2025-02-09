@@ -50,7 +50,7 @@ BundleArtifacts/
 *.appxupload
 
 # Sensitive configuration files
-GoTogether/GoTogether/Properties/appsettings.json
+GoTogether/Properties/appsettings.json
 GoTogether/Properties/appsettings.Development.json
 
 # Temporary and backup files

@@ -6,13 +6,6 @@ namespace GoTogether
 {
     public class Subsription
     {
-        private readonly DatabaseConnection _databaseConnection;
-
-        public Subsription(DatabaseConnection databaseConnection)
-        {
-            _databaseConnection = databaseConnection;
-        }
-
         [Subscribe(With = nameof(SubscribeToMessagesByChatId))]
         [Topic("Chat_{chatId}")]
         public Task<Message> OnMessageReceived([EventMessage] Message Message)

@@ -12,16 +12,11 @@ namespace GoTogether.Services.RecoveryService;
 public class EmailService : IEmailService
 {
     private readonly HttpClient _httpClient;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IMemoryCache _cache;
     private readonly DatabaseConnection _databaseConnection;
 
-    public EmailService(IHttpContextAccessor httpContextAccessor, IMemoryCache cache,
-        IHttpClientFactory httpClientFactory, DatabaseConnection databaseConnection)
+    public EmailService(IHttpClientFactory httpClientFactory, DatabaseConnection databaseConnection)
     {
         _httpClient = httpClientFactory.CreateClient();
-        _httpContextAccessor = httpContextAccessor;
-        _cache = cache;
         _databaseConnection = databaseConnection;
     }
 
@@ -44,10 +39,8 @@ public class EmailService : IEmailService
                 d_expiration_time = DateTime.UtcNow.AddMinutes(5),
             });
 
-            string url = $"{ConfigurationHelper.GetBaseUrl()}:7111/EmailSender/SendRecoveryMail";
+            await SendMessage("SendRecoveryMail", Helpers.GenerateEmailCodeJson(address, code));
 
-            await SendMessage(url, Helpers.GenerateEmailCodeJson(address, code));
-            
             return true;
         }
         catch (HttpRequestException hrq)
@@ -68,8 +61,8 @@ public class EmailService : IEmailService
 
             if (user == null)
                 throw new ArgumentException("USER_NOT_FOUND_PROBLEM");
-            
-            if(string.IsNullOrWhiteSpace(user.c_email))
+
+            if (string.IsNullOrWhiteSpace(user.c_email))
                 throw new ArgumentException("EMAIL_NOT_SELECTED_PROBLEM");
 
             int code = Helpers.GenerateCode();
@@ -82,9 +75,7 @@ public class EmailService : IEmailService
                 d_expiration_time = DateTime.UtcNow.AddMinutes(5),
             });
 
-            string url = $"{ConfigurationHelper.GetBaseUrl()}:7111/EmailSender/SendConfirmationMail";
-
-            await SendMessage(url, Helpers.GenerateEmailCodeJson(user.c_email, code));
+            await SendMessage("SendConfirmationMail", Helpers.GenerateEmailCodeJson(user.c_email, code));
             return true;
         }
         catch (HttpRequestException hrq)
@@ -98,11 +89,12 @@ public class EmailService : IEmailService
     }
 
     //TODO: переделать под rabbit
-    public async Task SendMessage(string url, StringContent body)
+    public async Task SendMessage(string endpoint, StringContent body)
     {
-        if(string.IsNullOrWhiteSpace(url))
+        if (string.IsNullOrWhiteSpace(endpoint))
             throw new ArgumentException("INVALID_URL_PROBLEM");
-        HttpResponseMessage response = await _httpClient.PostAsync(url, body);
+        HttpResponseMessage response =
+            await _httpClient.PostAsync($"{ConfigurationHelper.GetBaseUrl()}:7111/EmailSender/{endpoint}", body);
 
         if (!response.IsSuccessStatusCode)
             throw new HttpRequestException($"Failed to send email. Status code: {response.StatusCode}");
@@ -127,12 +119,10 @@ public class EmailService : IEmailService
             };
 
             invite.c_code = Helpers.ComputeHash(invite.id.ToString());
-            
+
             await _databaseConnection.TripInvites.AddAsync(invite);
 
-            string url = $"{ConfigurationHelper.GetBaseUrl()}:7111/EmailSender/SendInvite";
-
-            await SendMessage(url, Helpers.GenerateInviteMessageBodyJson(user.c_email, invite.c_code));
+            await SendMessage("SendInvite", Helpers.GenerateInviteMessageBodyJson(user.c_email, invite.c_code));
             return true;
         }
         catch (HttpRequestException hrq)

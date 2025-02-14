@@ -18,6 +18,7 @@ public class RoleService : IRoleService
 
     public async Task<List<UserRole>> GetUserRoles()
     {
+        //TODO: отрефакторить код
         if (_memoryCache.TryGetValue("UserRoles", out List<UserRole> roles))
         {
             if (roles == null || roles.Any())
@@ -39,6 +40,7 @@ public class RoleService : IRoleService
 
     public async Task<List<TripRole>> GetTripRoles()
     {
+        //TODO: отрефакторить код
         if (_memoryCache.TryGetValue("TripRoles", out List<TripRole> roles))
         {
             if (roles != null || roles.Any())

@@ -109,6 +109,7 @@ namespace GoTogether
         [GraphQLDescription("Временная мутация для дропа бд пользователей :)")]
         public async Task DeleteAllUsers()
         {
+            //TODO: заменить на вызов метода из репозитория
             _databaseConnection.Users.ExecuteDelete();
             await _databaseConnection.SaveChangesAsync();
         }
@@ -156,6 +157,7 @@ namespace GoTogether
             "если всё ок то обновляется пароль и возвращается true, иначе экзепш в лицо")]
         public async Task<bool> PasswordRecovery(string email, string code, string newPassword)
         {
+            //TODO: отрефакторить код
             var user = await _databaseConnection.Users.FirstOrDefaultAsync(u => u.c_email == email);
             if (user == null)
                 throw new ArgumentException("USER_NOT_FOUND_PROBLEM");

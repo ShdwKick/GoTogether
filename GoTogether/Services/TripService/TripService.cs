@@ -13,20 +13,15 @@ public class TripService : ITripService
 {
     private readonly IUserRepository _userRepository;
     private readonly ITripRepository _tripRepository;
-    private readonly DatabaseConnection _databaseConnection;
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IMemoryCache _memoryCache;
     private readonly ICountryRepository _countryRepository;
     private readonly ICityRepository _cityRepository;
     private readonly ILandmarkRepository _landmarkRepository;
 
-    public TripService(IUserRepository userRepository, DatabaseConnection databaseConnection,
-        IHttpContextAccessor httpContextAccessor, ITripRepository tripRepository, IMemoryCache memoryCache,
+    public TripService(IUserRepository userRepository, ITripRepository tripRepository, IMemoryCache memoryCache,
         ICountryRepository countryRepository, ICityRepository cityRepository, ILandmarkRepository landmarkRepository)
     {
         _userRepository = userRepository;
-        _databaseConnection = databaseConnection;
-        _httpContextAccessor = httpContextAccessor;
         _tripRepository = tripRepository;
         _memoryCache = memoryCache;
         _countryRepository = countryRepository;

@@ -23,9 +23,10 @@ namespace GoTogether
             var builder = WebApplication.CreateBuilder(args);
 
 #if DEBUG
-            builder.Configuration.AddJsonFile("Properties/appsettings.Development.json", optional: false, reloadOnChange: true);
+            builder.Configuration.AddJsonFile("Properties/appsettings.Development.json", optional: false,
+                reloadOnChange: true);
 #else
-                builder.Configuration.AddJsonFile("Properties/appsettings.json", optional: false, reloadOnChange: true);
+            builder.Configuration.AddJsonFile("Properties/appsettings.json", optional: false, reloadOnChange: true);
 #endif
 
             // Настройка авторизации
@@ -41,7 +42,7 @@ namespace GoTogether
             builder.Services.AddScoped<Mutation>();
             builder.Services.AddScoped<Subsription>();
             builder.Services.AddScoped<DatabaseConnection>();
-            
+
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<ITripRepository, TripRepository>();
             builder.Services.AddScoped<ICountryRepository, CountryRepository>();
@@ -54,8 +55,6 @@ namespace GoTogether
             builder.Services.AddScoped<IRoleService, RoleService>();
             builder.Services.AddSingleton(new ConfigurationHelper(builder.Configuration));
 
-
-            
 
             builder.Services.AddGraphQLServer()
                 .ModifyRequestOptions(options =>
@@ -136,7 +135,7 @@ namespace GoTogether
 
                 context.Response.Body = originalBody;
             });
-            
+
             Helpers.InitializeServiceProvider(app.Services);
 
             app.Run();

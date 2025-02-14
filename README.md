@@ -12,7 +12,7 @@ This is a server-side application written in C#. It leverages the HotChocolate l
 
 ### Prerequisites
 
-- .NET 6.0 or higher
+- .NET 9.0 or higher
 - PostgreSQL database
 - Tools for managing PostgreSQL (e.g., pgAdmin, DBeaver)
 
@@ -69,7 +69,7 @@ Feel free to fork the repository, create a new branch, and submit a pull request
 
 ### Требования
 
-- .NET 6.0 или выше
+- .NET 9.0 или выше
 - PostgreSQL база данных
 - Инструменты для работы с PostgreSQL (например, pgAdmin, DBeaver)
 

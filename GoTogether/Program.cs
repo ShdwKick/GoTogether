@@ -4,6 +4,8 @@ using GoTogether.Repositories;
 using GoTogether.Repositories.TripRepositories;
 using GoTogether.Repositories.UserRepository;
 using GoTogether.Services.DatabaseInitializerService;
+using GoTogether.Services.RabbitHostedService;
+using GoTogether.Services.RabbitService;
 using GoTogether.Services.RecoveryService;
 using GoTogether.Services.RoleService;
 using GoTogether.Services.TripService;
@@ -53,7 +55,12 @@ namespace GoTogether
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<ITripService, TripService>();
             builder.Services.AddScoped<IRoleService, RoleService>();
+            
             builder.Services.AddSingleton(new ConfigurationHelper(builder.Configuration));
+            
+            
+            builder.Services.AddSingleton<IRabbitService, RabbitService>();
+            builder.Services.AddHostedService<RabbitHostedService>();
 
 
             builder.Services.AddGraphQLServer()

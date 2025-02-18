@@ -14,6 +14,7 @@ public class RabbitService : IRabbitService
     private readonly string _exchangeName;
     private readonly string _recoveryRoutingKeyName;
     private readonly string _confirmationRoutingKeyName;
+    private readonly string _inviteRoutingKeyName;
 
     public RabbitService()
     {
@@ -26,6 +27,7 @@ public class RabbitService : IRabbitService
         _exchangeName = "emailExchange";
         _recoveryRoutingKeyName = "email.recovery";
         _confirmationRoutingKeyName = "email.confirmation";
+        _inviteRoutingKeyName = "email.invite";
     }
 
     public async Task InitializeServiceAsync()
@@ -38,9 +40,12 @@ public class RabbitService : IRabbitService
             autoDelete: false);
         await _channel.QueueDeclareAsync(queue: _confirmationRoutingKeyName, durable: true, exclusive: false,
             autoDelete: false);
+        await _channel.QueueDeclareAsync(queue: _inviteRoutingKeyName, durable: true, exclusive: false,
+            autoDelete: false);
 
         await _channel.QueueBindAsync(_recoveryRoutingKeyName, _exchangeName, _recoveryRoutingKeyName);
         await _channel.QueueBindAsync(_confirmationRoutingKeyName, _exchangeName, _confirmationRoutingKeyName);
+        await _channel.QueueBindAsync(_inviteRoutingKeyName, _exchangeName, _inviteRoutingKeyName);
     }
 
     public async Task PublishMessageAsync(string messageType, object message)
@@ -49,6 +54,7 @@ public class RabbitService : IRabbitService
         {
             "Confirmation" => _confirmationRoutingKeyName,
             "Recovery" => _recoveryRoutingKeyName,
+            "Invite" => _inviteRoutingKeyName,
             _ => throw new ArgumentException("Unknown message type")
         };
 

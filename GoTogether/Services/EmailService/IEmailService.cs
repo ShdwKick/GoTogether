@@ -6,6 +6,6 @@ public interface IEmailService
 {
     Task<bool> SendRecoveryEmail(string address);
     Task<bool> SendEmailConfirmationEmail();
-    Task SendMessage(string endpoint, StringContent body);
+    Task SendMessage(string messageType, StringContent body);
     Task<bool> SendInviteEmail(string email, Guid tripId);
 }

@@ -1,0 +1,28 @@
+﻿version: '3.8'
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres_container
+    restart: always
+    environment:
+      POSTGRES_DB: your_db
+      POSTGRES_USER: your_user
+      POSTGRES_PASSWORD: your_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  app:
+    image: shadowkick/gotogether-app:latest
+    container_name: gotogether_app
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=GoTogether;Username=postgres;Password=123"
+    ports:
+      - "8080:8080"
+
+volumes:
+  pg_data:

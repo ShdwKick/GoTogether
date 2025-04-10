@@ -103,7 +103,7 @@ namespace GoTogether
 
             builder.WebHost.ConfigureKestrel(options =>
             {
-                options.ListenAnyIP(5012);
+                options.ListenAnyIP(5000);
                 options.ListenAnyIP(5001, listenOptions => { listenOptions.UseHttps(); });
             });
 
@@ -115,8 +115,7 @@ namespace GoTogether
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseWebSockets();
-
-
+            
             app.MapGraphQL();
             //app.MapControllers();
 
